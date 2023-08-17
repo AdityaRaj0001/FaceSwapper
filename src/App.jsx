@@ -1,6 +1,5 @@
 import react, { useState } from "react";
 import Imageuploader from "./Imageuploader";
-import AvatarSelector from "./AvatarSelector";
 import axios from "axios";
 import Result from "./Result";
 
@@ -9,98 +8,43 @@ function App() {
   const [inputImage, setInputImage] = useState(null);
   const [targetImage,setTargetImage]=useState(null);
   const [resultImage,setResultImage]=useState('');
-
+  const [generating, setgenerating] = useState(0);
 
   //handles input image upload on page 1
-  const handleUpload = async (event)=>{
+  const handleUpload = async (event,setImage)=>{
     const file = event.target.files[0];
-    const reader = new FileReader();
-
-    reader.onload = async () => {
-      
-      const dataURI = reader.result;
-      setInputImage(dataURItoBlob(dataURI));
-    };
-
-    if (file) {
-      reader.readAsDataURL(file);
-    }
-  }
-
-  const handleTargetImage= async(url)=>{
-    try {
-
-      const response= await fetch(url)
-      if(response.ok){
-        console.log("ok till now")
-      }
-      const blob = await response.blob();
-      const reader = new FileReader();
-
-      reader.onload = async () => {
-        const dataURI = reader.result;
-        setTargetImage(dataURItoBlob(dataURI));
-        console.log("TargetImageasB64:",targetImage)
-      };
-
-      reader.readAsDataURL(blob);
-      handleSwapFaces();
-      
-    } catch (error) {
-      console.error('Error converting target image:', error);
-    }
-  }
-
-  function dataURItoBlob(dataURI) {
-    const byteString = atob(dataURI.split(',')[1]);
-    const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-    const ab = new ArrayBuffer(byteString.length);
-    const ia = new Uint8Array(ab);
-    for (let i = 0; i < byteString.length; i++) {
-      ia[i] = byteString.charCodeAt(i);
-    }
-    return new Blob([ab], { type: mimeString });
+    setImage(file);
   }
 
   const handleSwapFaces= async ()=>{
+    setgenerating(1);
 
       try {
 
-        // const requestBody={
-        //   input_face_image:inputImage,
-        //   target_face_image:targetImage,
-        //   file_type:'image',
-        // }
         const formData=new FormData();
         formData.append('input_face_image',inputImage)
         formData.append('target_face_image', targetImage);
-        formData.append('file_type', 'image');
 
+        const response = await axios.post('https://odd-blue-katydid-wrap.cyclic.cloud/',formData,{
+          headers:{
+            'x-api-key':'SG_09a23dbaa95fa82b',
+          }
+        });
 
-        const response = await axios.post('http://localhost:3001/api/faceswapper',formData);
-
-       
-        const arrayBufferView = new Uint8Array(response.data);
-        const blob = new Blob([arrayBufferView], { type: 'image/png' });
-        const url = URL.createObjectURL(blob);
-        setResultImage(url);
-        handleNextStep();
+        
+        setResultImage(response.data.result.secure_url);
 
       } catch (error) {
         console.error('An error was encountered:', error);
       }
 
-
   }
 
-
-
   //changes components based on number
-  const handleNextStep = () => {
-    setCurrentStep(currentstep + 1);
-  };
+  
 
   return (
+    
     <div>
       <nav>
         <ul>
@@ -110,28 +54,23 @@ function App() {
         </ul>
         <ul>
           <li>
-            <a href="#" role="button" className="contrast outline">
+            <a href="https://github.com/AdityaRaj0001/FaceSwapper" role="button" className="contrast outline">
               Github
             </a>
           </li>
         </ul>
       </nav>
-      {currentstep === 1 && (
+
         <Imageuploader
           handleUpload={handleUpload}
-          handleNextStep={handleNextStep}
+          setInputImage={setInputImage}
+          setTargetImage={setTargetImage}
+          handleSwapFaces={handleSwapFaces}
         />
-      )}
-
-      {currentstep === 2 && (
-          <AvatarSelector
-          handleTargetImage={handleTargetImage}/>
-        )
-      }
-      {currentstep === 3 && (
-          <Result resultImage={resultImage}/>
-        )
-      }
+        
+          <Result resultImage={resultImage} generating={generating}  />
+        
+      
     </div>
   );
 }

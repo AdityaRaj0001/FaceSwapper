@@ -1,17 +1,23 @@
 import React from "react";
 
-const Imageuploader = ({handleUpload,handleNextStep}) => {
+const Imageuploader = ({handleUpload,setInputImage,setTargetImage,handleSwapFaces}) => {
   
 
   return (
     <main className="container">
       
         
-        <label htmlFor="file">
-          File browser
-          <input type="file" accept="image/*" name="file" onChange={(e)=>handleUpload(e)} />
-        </label>
-        <a href="#" role="button" className="outline" onClick={handleNextStep}>next</a>
+        
+          <span>Input Image</span>
+          <input type="file" accept="image/*" name="file" onChange={(e)=>handleUpload(e,setInputImage)} />
+        
+
+        
+          <span>Avatar Image</span>
+          <input type="file" accept="image/*" name="file" onChange={(e)=>handleUpload(e,setTargetImage)} />
+      
+
+      <button onClick={handleSwapFaces}>Swap</button>
         
       
     </main>

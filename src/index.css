@@ -13,18 +13,23 @@ nav{
 }
 
 .container{
-    height:100vh;
     display:flex;
-    align-items: center;
-    justify-content: center;
+    margin-top:40px;
     gap:30px;
-    flex-wrap:wrap;
+    flex-direction: column;
+}
+header,footer{
+    display:flex;
+    margin-top:40px;
+    gap:30px;
+    justify-content: center;
+    align-items: center;
     flex-direction: column;
 }
 
-article{
-    width:30%;
+button{
+    max-width:31%;
 }
-.avatar{
-    cursor:pointer;
+input{
+    width:40% !important;
 }
