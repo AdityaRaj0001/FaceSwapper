@@ -6,8 +6,8 @@ import Result from "./Result";
 
 function App() {
   const [currentstep, setCurrentStep] = useState(1);
-  const [inputImage, setInputImage] = useState('');
-  const [targetImage,setTargetImage]=useState('');
+  const [inputImage, setInputImage] = useState(null);
+  const [targetImage,setTargetImage]=useState(null);
   const [resultImage,setResultImage]=useState('');
 
 
@@ -17,8 +17,9 @@ function App() {
     const reader = new FileReader();
 
     reader.onload = async () => {
-      const base64Image = reader.result.split(',')[1];
-      setInputImage(base64Image);
+      
+      const dataURI = reader.result;
+      setInputImage(dataURItoBlob(dataURI));
     };
 
     if (file) {
@@ -37,8 +38,8 @@ function App() {
       const reader = new FileReader();
 
       reader.onload = async () => {
-        const base64Image = reader.result.split(',')[1];
-        setTargetImage(base64Image);
+        const dataURI = reader.result;
+        setTargetImage(dataURItoBlob(dataURI));
         console.log("TargetImageasB64:",targetImage)
       };
 
@@ -50,25 +51,33 @@ function App() {
     }
   }
 
+  function dataURItoBlob(dataURI) {
+    const byteString = atob(dataURI.split(',')[1]);
+    const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([ab], { type: mimeString });
+  }
+
   const handleSwapFaces= async ()=>{
 
       try {
 
-        const requestBody={
-          input_face_image:inputImage,
-          target_face_image:targetImage,
-          file_type:'image',
-        }
-        const response = await axios.post('https://api.segmind.com/v1/sd2.1-faceswapper',
-          requestBody,
-          {
-            headers: {
-              'x-api-key': 'SG_3ac087079f26a77c',
-              'Content-Type': 'application/json',
-            },
-            responseType: 'arraybuffer',
-          }
-        );
+        // const requestBody={
+        //   input_face_image:inputImage,
+        //   target_face_image:targetImage,
+        //   file_type:'image',
+        // }
+        const formData=new FormData();
+        formData.append('input_face_image',inputImage)
+        formData.append('target_face_image', targetImage);
+        formData.append('file_type', 'image');
+
+
+        const response = await axios.post('http://localhost:3001/api/faceswapper',formData);
 
        
         const arrayBufferView = new Uint8Array(response.data);
