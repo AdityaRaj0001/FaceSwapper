@@ -1,12 +1,11 @@
 import React from "react";
 
+import { saveAs } from "file-saver";
+
 const Result = ({ resultImage,generating }) => {
   const handleDownloadImage = () => {
     if (resultImage) {
-      const a = document.createElement("a");
-      a.href = resultImage;
-      // a.download = "faceswapped_image.png"; // Change the filename as needed
-      a.click();
+      saveAs(resultImage,"swapped.png");
     }
   };
 
@@ -31,8 +30,8 @@ const Result = ({ resultImage,generating }) => {
           
         </header>
         <footer>
-          <button  onClick={handleDownloadImage}>open full Image</button>
-          <button  class="secondary" onClick={()=>{window.location.reload()}}>Try again</button> 
+          <button  onClick={handleDownloadImage}>download </button>
+          <button  className="secondary" onClick={()=>{window.location.reload()}}>Try again</button> 
         </footer>
       </article>
       

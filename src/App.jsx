@@ -3,8 +3,8 @@ import Imageuploader from "./Imageuploader";
 import axios from "axios";
 import Result from "./Result";
 
+
 function App() {
-  const [currentstep, setCurrentStep] = useState(1);
   const [inputImage, setInputImage] = useState(null);
   const [targetImage,setTargetImage]=useState(null);
   const [resultImage,setResultImage]=useState('');

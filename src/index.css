@@ -28,7 +28,8 @@ header,footer{
 }
 
 button{
-    max-width:31%;
+    min-width:30%;
+    max-width:40%;
 }
 input{
     width:40% !important;
